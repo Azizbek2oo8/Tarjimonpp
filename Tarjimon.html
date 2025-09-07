@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarjimon Ilova</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script type="text/javascript" src="https://cdn.tgads.space/assets/js/tg-ads-co-widget.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      position: relative;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: rise 15s infinite ease-in;
+    }
+    @keyframes rise {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-120vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      z-index: 10;
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      resize: none;
+      font-size: 14px;
+    }
+    select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Pufakchalar -->
+  <div class="bubble" style="width:40px; height:40px; left:10%; animation-duration:12s;"></div>
+  <div class="bubble" style="width:25px; height:25px; left:30%; animation-duration:18s;"></div>
+  <div class="bubble" style="width:50px; height:50px; left:50%; animation-duration:20s;"></div>
+  <div class="bubble" style="width:30px; height:30px; left:70%; animation-duration:14s;"></div>
+  <div class="bubble" style="width:20px; height:20px; left:85%; animation-duration:16s;"></div>
+
+  <!-- Tarjimon kartochka -->
+  <div class="container">
+    <h2>🌐 Tarjimon</h2>
+    <textarea id="inputText" placeholder="Matn kiriting..."></textarea>
+    
+    <select id="lang">
+      <option value="en">Ingliz</option>
+      <option value="ru">Rus</option>
+      <option value="tr">Turk</option>
+      <option value="uz">O‘zbek</option>
+    </select>
+    
+    <button id="tarjimaButton">Tarjima qilish</button>
+    
+    <textarea id="outputText" placeholder="Natija bu yerda chiqadi..." readonly></textarea>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Reklama widgetni sozlash
+      const adexiumAds = new AdexiumWidget({
+        wid: 'd07b5623-c3d8-4620-a2f0-29b2e4ea8dca', // Sizning wid
+        adFormat: 'interstitial',
+      });
+
+      // Tugmani topamiz
+      const tarjimaBtn = document.getElementById("tarjimaButton");
+
+      // Tugmaga bosilganda avval reklama chiqaramiz
+      tarjimaBtn.onclick = () => {
+        console.log("Reklama uchun so'rov yuborilmoqda...");
+        adexiumAds.requestAd('interstitial');
+      };
+
+      // Reklama qabul qilinganda ekranda ko‘rsatamiz
+      adexiumAds.on('adReceived', (ad) => {
+        console.log("Reklama qabul qilindi:", ad);
+        adexiumAds.displayAd(ad);
+      });
+
+      // Reklama ko‘rsatilganda log yozamiz
+      adexiumAds.on('adDisplayed', () => {
+        console.log("Reklama ekranda ko'rsatildi.");
+      });
+
+      // Reklama yopilganda tarjima qilishni ishga tushiramiz
+      adexiumAds.on('adClosed', () => {
+        console.log("Reklama yopildi. Endi tarjima qilamiz...");
+        tarjima();
+      });
+
+      // Reklama topilmasa bevosita tarjima qilamiz
+      adexiumAds.on('noAdFound', () => {
+        console.log("Reklama topilmadi, tarjima to‘g‘ridan-to‘g‘ri qilinadi.");
+        tarjima();
+      });
+    });
+
+    // Tarjima funksiyasi
+    async function tarjima() {
+      let text = document.getElementById("inputText").value;
+      let lang = document.getElementById("lang").value;
+
+      if (text.trim() === "") {
+        alert("Matn kiriting!");
+        return;
+      }
+
+      try {
+        let res = await fetch(`https://lingva.ml/api/v1/uz/${lang}/${encodeURIComponent(text)}`);
+        let data = await res.json();
+        document.getElementById("outputText").value = data.translation;
+      } catch (e) {
+        alert("Xatolik yuz berdi!");
+      }
+    }
+  </script>
+</body>
+    </html>
